@@ -64,5 +64,42 @@ npm run build (デプロイ用のコマンド　一つのファイルにまと�
 npm run eject (webpackなどの設定を変更したいとき用)
 ```
 
+### コンポーネント概念について
+- 見た目と機能を持つUI部品
+- 基本は二種類のコンポ
+    - Class Component (クラスコンポーネント) 
+    - Functional Component (ファンクション　コンポーネント)
+```jsx:ComponentSample
 
-    
+// class component
+import React,{Component} from 'react';
+
+class header extends Component {
+    render(){
+        return <><img href="#" className="icon" /></>
+    }
+}
+
+export default header;
+
+// function component
+import React,{Component} from 'react';
+
+class header = () => {
+    return (
+        <>
+            <img href="#" className="icon" />
+        </>
+    )
+}
+
+export default header;
+
+```
+- 記述量が違う/propsというあ値渡しの機能もある
+- コンポーネントを使う理由
+    - 再利用するために(recycle)
+    - コードを見やすくし点検効率を上げるため
+        - 1つのパーツにつき1ファイル
+        - 別ファイル管理にすることでコードが見やすい
+    - 変更の際に修正箇所を少なくするため
