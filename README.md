@@ -69,6 +69,7 @@ npm run eject (webpackなどの設定を変更したいとき用)
 - 基本は二種類のコンポ
     - Class Component (クラスコンポーネント) 
     - Functional Component (ファンクション　コンポーネント)
+
 ```jsx:ComponentSample
 
 // class component
@@ -103,3 +104,100 @@ export default header;
         - 1つのパーツにつき1ファイル
         - 別ファイル管理にすることでコードが見やすい
     - 変更の際に修正箇所を少なくするため
+- app.jsに関しては通常のfunction宣言 compornents/???に関してはアロー関数を用いる。 
+
+### props
+```component
+const Article = (props) => {
+    return (
+        <div>
+            <h2>{props.title}</h2>
+            <p>{props.content}</p>
+        </div>
+    );
+};
+
+export default Article
+
+```
+
+```App.jsx
+import Article from "./components/Article";
+
+function App(){
+    return(
+        <div>
+            <Article
+                title = {"タイトルサンプル"}
+                content = {"内容について"}
+            />
+        </div>
+    );
+}
+
+export default App;
+```
+
+- 値を引数にpropsを指定する。
+
+### モジュール機能について
+- プログラムをモジュールという単位で分割する。
+- 原則は1ファイル1モジュール
+
+1. default export (名前なしexport)
+    - 推奨されている形
+    - 1ファイル　1export 
+    - 1度宣言したアロー関数をexportする形
+    - 名前付き関数宣言と同時にexport
+    - ```
+        export default function sample(props){
+            return <div>???</div>
+        }
+      ```
+2. default import (名前なしimport)
+    - default exportの内容をそのまま読み込む
+    - 
+
+3. 名前付きexport
+    - 1ファイルから複数モジュールをexportしたいとき
+    - React ではエントリポイントでよく使われます。
+    - エントリポイントとは・・・
+    - エントリポイントでは別名exportも併用している。（default ???の場合 defaultが読み込まれるのをasで名称を変換）
+    - export {default as Title} from "./Title"
+    - 1ファイルから複数のモジュールを読み込む
+    - import {ccc, sss} from "./index.js"
+    - エントリポイントから複数の読み込みをする際に使う。
+
+### Hooksについて
+- クラスコンポ―ネントでしか使えなかったことを使えるように
+    - コンポーネント内で状態を管理するstate
+    - コンポーネントの時間に流れに基づくライフサイクル
+- Hooksにより関数コンポーネントを使えるように
+
+- Reactコンポーネント内の値を書き換えたい
+    - コンポーネント内の要素をDOMで直接書き換える（従来のjs)
+    - 新しい値を使って再描画(再レンダリング)させる。
+- Reactコンポーネントが再描画されるきっかけ
+    - state 変更時
+    - props変更時
+
+1. useStateによるstateの宣言
+    - const [state, setState] = useState(initialState)
+    - 現在・更新関数・初期値の順
+
+2. stateの更新
+    - setState(newState);
+
+3. 具体例
+    - const [message, setMessage] = useState('Samples')
+    - const [likes, setLikes] = useState(0)
+    - const [isShow, setShow] = useStates(false)
+    <!-- - setShow(true); -->
+
+- propsとstateの違い
+    - propsは親から子に渡されている
+    - stateはコンポーネントの中で制御されるような値
+
+- propsへの関数を渡す際の注意
+    - NGはonclickメソッドなどに通常()付きで関数を渡したりすると実行されてしまってコールバックでも関数自体でもないので無限レンダリングが発生してしまうことがある。
+    - propsに渡すときには関数は実行しない。
