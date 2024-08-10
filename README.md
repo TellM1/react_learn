@@ -127,6 +127,7 @@ function ExpensiveComponent({ a, b }) {
 ### useCallback
 
 `useCallback`は、コールバック関数をメモ化するために使用されます。
+一応コールバック関数とは自身の処理を実行するのではなく、相手に実行してもらうのがコールバック関数です。
 
 ```javascript
 import React, { useCallback } from 'react';
