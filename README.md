@@ -1,203 +1,252 @@
-# About React 
-&
-### Reactとは
-- Facebook社開発のUIライブラリー
-- UI作成においてcomponentという概念が特徴としてある
-- componentの組み合わせによってwebPageを作成していく
-- 仮想DOMによって従来のツリー構造の画面描画より効率的な動作をする。
-    - Javascriptのオブジェクトとして扱うことでブラウザへの負荷を減らしjs engineのメモリを使用する。
-- DOMの状態をjsで管理することができ、状態を持つUIとされている
-- 既存の描画との差分を認識することができるため必要な部分だけを描画する差分描画できる
+# Reactの基本機能解説
 
-### JSXについて
-- JSの拡張言語とされている。
-- HTMLをそのまま書き込むことができる + JSの構文が使える
-- jsxは最終敵にReact要素を生成するため
-- フルスクラッチで書いたHTMLと結果的には同じものが表示できるように書くことが前提
-- React.createElementで生成処理をすることでhtmlを生成できている
-- React.create~~構文は直感的にかけずjsxにすることで楽に開発ができる
-- jsx基本文法規則
-    1. Reactライブラリーをimportする
-    2. return文の中がjsxの構文になる 
-    3. *class は className
-    4. 変数に関してはキャメルケースが前提 凸凹でつなぎ目をわかりやすくするやつ！
-    5. タグの最後に閉じタグが必要である
-    6. 変数記述には{}波カッコでかこう必要性がある
-    7. jsxは必ず階層構造であることが必要
-    8. React.Fragmentで囲うことで階層化を作ることができる htmlタグとして出力されないため〇
-    9. <></>で省略形で描ける
-```
-import React from 'react';
+## 目次
+1. [はじめに](#はじめに)
+2. [Hooks](#hooks)
+   - [useState](#usestate)
+   - [useEffect](#useeffect)
+   - [useContext](#usecontext)
+   - [useRef](#useref)
+   - [useMemo](#usememo)
+   - [useCallback](#usecallback)
+3. [Suspense](#suspense)
+4. [その他のuse関数](#その他のuse関数)
+   - [useReducer](#usereducer)
+   - [useLayoutEffect](#uselayouteffect)
+   - [useImperativeHandle](#useimperativehandle)
 
-const pushBtn = () =>{
-    var url = '******.com';
+## はじめに
 
-    return(
-        <React.Fragment>
-            <!-- 以下の部分に画面に返すHTML記述 -->
-            <button className={'push_btn'}>
-                push!
-            </button>
-            <!-- 最後の〆たぐ -->
-            <img href={url} />
-        </React.Fragment>
-    )
+Reactは、ユーザーインターフェースを構築するためのJavaScriptライブラリです。本記事では、Reactの基本的な機能、特にHooks、Suspense、およびその他のuse関数について解説します。
+
+## Hooks
+
+Hooksは、React 16.8で導入された機能で、クラスコンポーネントを書かずに状態やその他のReactの機能を使用できるようにします。
+
+### useState
+
+`useState`は、関数コンポーネント内で状態を管理するためのHookです。
+
+```javascript
+import React, { useState } from 'react';
+
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <div>
+      <p>カウント: {count}</p>
+      <button onClick={() => setCount(count + 1)}>
+        増加
+      </button>
+    </div>
+  );
 }
-export default pushBtn
 ```
 
-### 実際の開発に向けて導入
-- create-react-app
-    - 簡単にReactの開発環境を構築できる
-    - 本来はreact環境構築は設定が必要だったりする
-        - トランスパイラーのBabel 
-        - バンドら―のWebpack
-        <!-- 初学者向けではないため飛ばしたい -->
-    - Nodejs : 10.16以上
-    - npm : 5.6 以上
-    - 導入コマンドは[npx create-react-app myapp]
-    - myappは自分のファイル名
+### useEffect
+
+`useEffect`は、副作用を実行するためのHookです。コンポーネントのレンダリング後に実行されます。
+
+```javascript
+import React, { useState, useEffect } from 'react';
+
+function Example() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    document.title = `${count}回クリックされました`;
+  }, [count]);
+
+  return (
+    <div>
+      <p>{count}回クリックされました</p>
+      <button onClick={() => setCount(count + 1)}>
+        クリック
+      </button>
+    </div>
+  );
+}
 ```
-<!-- npm系でのコマンド一覧  -->
-npm start (appを起動)
-npm run build (デプロイ用のコマンド　一つのファイルにまとめる作業をしてくれる)
-npm run eject (webpackなどの設定を変更したいとき用)
+
+### useContext
+
+`useContext`は、Reactのコンテキストを簡単に使用するためのHookです。
+
+```javascript
+import React, { useContext } from 'react';
+
+const ThemeContext = React.createContext('light');
+
+function ThemedButton() {
+  const theme = useContext(ThemeContext);
+  return <button style={{ background: theme }}>テーマ付きボタン</button>;
+}
 ```
 
-### コンポーネント概念について
-- 見た目と機能を持つUI部品
-- 基本は二種類のコンポ
-    - Class Component (クラスコンポーネント) 
-    - Functional Component (ファンクション　コンポーネント)
+### useRef
 
-```jsx:ComponentSample
+`useRef`は、DOMノードへの参照や、再レンダリングをトリガーせずに値を保持するために使用されます。
 
-// class component
-import React,{Component} from 'react';
+```javascript
+import React, { useRef } from 'react';
 
-class header extends Component {
-    render(){
-        return <><img href="#" className="icon" /></>
+function TextInputWithFocusButton() {
+  const inputEl = useRef(null);
+
+  const onButtonClick = () => {
+    inputEl.current.focus();
+  };
+
+  return (
+    <>
+      <input ref={inputEl} type="text" />
+      <button onClick={onButtonClick}>入力にフォーカス</button>
+    </>
+  );
+}
+```
+
+### useMemo
+
+`useMemo`は、計算コストの高い関数の結果をメモ化するために使用されます。
+
+```javascript
+import React, { useMemo } from 'react';
+
+function ExpensiveComponent({ a, b }) {
+  const expensiveResult = useMemo(() => {
+    // 複雑な計算
+    return a * b;
+  }, [a, b]);
+
+  return <div>{expensiveResult}</div>;
+}
+```
+
+### useCallback
+
+`useCallback`は、コールバック関数をメモ化するために使用されます。
+
+```javascript
+import React, { useCallback } from 'react';
+
+function ParentComponent() {
+  const [count, setCount] = useState(0);
+
+  const incrementCount = useCallback(() => {
+    setCount(prevCount => prevCount + 1);
+  }, []);
+
+  return <ChildComponent onIncrement={incrementCount} />;
+}
+```
+
+## Suspense
+
+Suspenseは、コンポーネントがレンダリングを完了する前に何かを待機できるようにする機能です。
+
+```javascript
+import React, { Suspense } from 'react';
+
+const LazyComponent = React.lazy(() => import('./LazyComponent'));
+
+function MyComponent() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LazyComponent />
+    </Suspense>
+  );
+}
+```
+
+## その他のuse関数
+
+### useReducer
+
+`useReducer`は、複雑な状態ロジックを管理するためのHookです。
+
+```javascript
+import React, { useReducer } from 'react';
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'increment':
+      return { count: state.count + 1 };
+    case 'decrement':
+      return { count: state.count - 1 };
+    default:
+      throw new Error();
+  }
+}
+
+function Counter() {
+  const [state, dispatch] = useReducer(reducer, { count: 0 });
+
+  return (
+    <>
+      Count: {state.count}
+      <button onClick={() => dispatch({ type: 'increment' })}>+</button>
+      <button onClick={() => dispatch({ type: 'decrement' })}>-</button>
+    </>
+  );
+}
+```
+
+### useLayoutEffect
+
+`useLayoutEffect`は`useEffect`と似ていますが、DOMの変更後、ブラウザが画面を描画する前に同期的に実行されます。
+
+```javascript
+import React, { useLayoutEffect, useRef } from 'react';
+
+function Tooltip() {
+  const tooltipRef = useRef();
+
+  useLayoutEffect(() => {
+    const { current } = tooltipRef;
+    const { width, height } = current.getBoundingClientRect();
+    current.style.left = `${window.innerWidth / 2 - width / 2}px`;
+    current.style.top = `${window.innerHeight / 2 - height / 2}px`;
+  }, []);
+
+  return <div ref={tooltipRef}>これはツールチップです</div>;
+}
+```
+
+### useImperativeHandle
+
+`useImperativeHandle`は、親コンポーネントに公開するインスタンス値をカスタマイズするために使用されます。
+
+```javascript
+import React, { useRef, useImperativeHandle, forwardRef } from 'react';
+
+const ChildComponent = forwardRef((props, ref) => {
+  const inputRef = useRef();
+
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      inputRef.current.focus();
     }
+  }));
+
+  return <input ref={inputRef} />;
+});
+
+function ParentComponent() {
+  const childRef = useRef();
+
+  const handleClick = () => {
+    childRef.current.focus();
+  };
+
+  return (
+    <>
+      <ChildComponent ref={childRef} />
+      <button onClick={handleClick}>子コンポーネントにフォーカス</button>
+    </>
+  );
 }
-
-export default header;
-
-// function component
-import React,{Component} from 'react';
-
-class header = () => {
-    return (
-        <>
-            <img href="#" className="icon" />
-        </>
-    )
-}
-
-export default header;
-
-```
-- 記述量が違う/propsというあ値渡しの機能もある
-- コンポーネントを使う理由
-    - 再利用するために(recycle)
-    - コードを見やすくし点検効率を上げるため
-        - 1つのパーツにつき1ファイル
-        - 別ファイル管理にすることでコードが見やすい
-    - 変更の際に修正箇所を少なくするため
-- app.jsに関しては通常のfunction宣言 compornents/???に関してはアロー関数を用いる。 
-
-### props
-```component
-const Article = (props) => {
-    return (
-        <div>
-            <h2>{props.title}</h2>
-            <p>{props.content}</p>
-        </div>
-    );
-};
-
-export default Article
-
 ```
 
-```App.jsx
-import Article from "./components/Article";
-
-function App(){
-    return(
-        <div>
-            <Article
-                title = {"タイトルサンプル"}
-                content = {"内容について"}
-            />
-        </div>
-    );
-}
-
-export default App;
-```
-
-- 値を引数にpropsを指定する。
-
-### モジュール機能について
-- プログラムをモジュールという単位で分割する。
-- 原則は1ファイル1モジュール
-
-1. default export (名前なしexport)
-    - 推奨されている形
-    - 1ファイル　1export 
-    - 1度宣言したアロー関数をexportする形
-    - 名前付き関数宣言と同時にexport
-    - ```
-        export default function sample(props){
-            return <div>???</div>
-        }
-      ```
-2. default import (名前なしimport)
-    - default exportの内容をそのまま読み込む
-    - 
-
-3. 名前付きexport
-    - 1ファイルから複数モジュールをexportしたいとき
-    - React ではエントリポイントでよく使われます。
-    - エントリポイントとは・・・
-    - エントリポイントでは別名exportも併用している。（default ???の場合 defaultが読み込まれるのをasで名称を変換）
-    - export {default as Title} from "./Title"
-    - 1ファイルから複数のモジュールを読み込む
-    - import {ccc, sss} from "./index.js"
-    - エントリポイントから複数の読み込みをする際に使う。
-
-### Hooksについて
-- クラスコンポ―ネントでしか使えなかったことを使えるように
-    - コンポーネント内で状態を管理するstate
-    - コンポーネントの時間に流れに基づくライフサイクル
-- Hooksにより関数コンポーネントを使えるように
-
-- Reactコンポーネント内の値を書き換えたい
-    - コンポーネント内の要素をDOMで直接書き換える（従来のjs)
-    - 新しい値を使って再描画(再レンダリング)させる。
-- Reactコンポーネントが再描画されるきっかけ
-    - state 変更時
-    - props変更時
-
-1. useStateによるstateの宣言
-    - const [state, setState] = useState(initialState)
-    - 現在・更新関数・初期値の順
-
-2. stateの更新
-    - setState(newState);
-
-3. 具体例
-    - const [message, setMessage] = useState('Samples')
-    - const [likes, setLikes] = useState(0)
-    - const [isShow, setShow] = useStates(false)
-    <!-- - setShow(true); -->
-
-- propsとstateの違い
-    - propsは親から子に渡されている
-    - stateはコンポーネントの中で制御されるような値
-
-- propsへの関数を渡す際の注意
-    - NGはonclickメソッドなどに通常()付きで関数を渡したりすると実行されてしまってコールバックでも関数自体でもないので無限レンダリングが発生してしまうことがある。
-    - propsに渡すときには関数は実行しない。
+以上が、Reactの基本的な機能の概要です。これらの機能を理解し適切に使用することで、効率的で再利用可能なReactコンポーネントを作成することができます。
